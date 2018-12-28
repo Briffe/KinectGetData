@@ -8,16 +8,16 @@ namespace KinectGetData
 {
     public struct ThrPoint
     {
-        public double X;
-        public double Y;
-        public double Z;
+        public float X;
+        public float Y;
+        public float Z;
         /// <summary>
         /// 三维结构体的赋值
         /// </summary>
         /// <param name="X"></param>
         /// <param name="Y"></param>
         /// <param name="Z"></param>
-        public ThrPoint(double X, double Y, double Z)
+        public ThrPoint(float X, float Y, float Z)
         {
             if (X == null || Y == null || Z == null) throw new ArgumentException();
             this.X = X;
