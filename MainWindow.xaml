@@ -1,0 +1,78 @@
+﻿<Window x:Class="KinectGetData.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="KinectDTW" Height="800" Width="1280" Loaded="WindowLoaded" Closed="WindowClosed">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="140" />
+            <RowDefinition Height="270" />
+            <RowDefinition Height="270" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="800" />
+        </Grid.ColumnDefinitions>
+        <Label Content="Kinect SDK Dynamic Time Warping (DTW) Gesture Recognition" Grid.Column="2" HorizontalAlignment="Left" Margin="208.4,10,0,0" VerticalAlignment="Top" Height="30" FontSize="16"/>
+
+        <StackPanel Grid.Column="0" Grid.Row="1">
+            <ComboBox Name="gestureList" Width="400">
+                <ComboBoxItem IsSelected="True">@Right hand swipe left</ComboBoxItem>
+                <ComboBoxItem>@Right hand swipe right</ComboBoxItem>
+                <ComboBoxItem>@Left hand swipe left</ComboBoxItem>
+                <ComboBoxItem>@Left hand swipe right</ComboBoxItem>
+                <ComboBoxItem>@Two hands zoom in</ComboBoxItem>
+                <ComboBoxItem>@Two hands zoom out</ComboBoxItem>
+                <ComboBoxItem>@Right hand wave</ComboBoxItem>
+                <ComboBoxItem>@Left hand wave</ComboBoxItem>
+                <ComboBoxItem>@Right hand pull down</ComboBoxItem>
+                <ComboBoxItem>@Left hand pull down</ComboBoxItem>
+                <ComboBoxItem>@Right hand push up</ComboBoxItem>
+                <ComboBoxItem>@Left hand push up</ComboBoxItem>
+                <ComboBoxItem>@Both hands pull down</ComboBoxItem>
+                <ComboBoxItem>@Both hands push up</ComboBoxItem>
+                <ComboBoxItem>@Get on down at the disco!</ComboBoxItem>
+            </ComboBox>
+            <Button Name="dtwRead" Content="Read" Click="DtwReadClick" Width="200" IsEnabled="False" />
+            <Button Name="dtwCapture" Content="Capture" Click="DtwCaptureClick" Width="200 "/>
+            <Button Name="dtwStore" Content="Store" IsEnabled="False" Click="DtwStoreClick" Width="200" />
+            <Button Name="dtwLoadFile" Content="Load gesture file" IsEnabled="True" Click="DtwLoadFile" Width="200" />
+            <Button Name="dtwSaveToFile" Content="Save to file" IsEnabled="True" Click="DtwSaveToFile" Width="200" />
+            <Button Name="dtwShowGestureTest" Content="Show Gesture Text" IsEnabled="True" Click="DtwShowGestureText" Width="200" />
+        </StackPanel>
+
+        <TextBox FontSize="14" x:Name="results" Margin="10,10.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
+        <TextBox FontSize="14" x:Name="status" Margin="10,45.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
+        <TextBox FontSize="14" x:Name="currentBufferFrame" Margin="10,75.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
+        <TextBox FontSize="14" x:Name="frameRate" Margin="10,110.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
+
+
+
+        <TextBox Grid.Column="0" Grid.Row="3" FontSize="11" Name="dtwTextOutput" Margin="0,77.2,0.8,-36" Focusable="True" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Center" VerticalAlignment="Top" Width="200" Height="230" VerticalScrollBarVisibility="Auto" IsReadOnly="True" />
+        <Image x:Name="videoImage" Grid.Column="2" HorizontalAlignment="Left" Height="405" Margin="124.4,4.2,-43.6,0" Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top" Width="720"/>
+        <Viewbox x:Name="kinectBodyViewbox" Grid.Column="2" HorizontalAlignment="Left" Height="265" Margin="310.4,25.2,0,-19" Grid.Row="3" VerticalAlignment="Top" Width="320">
+            <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+        </Viewbox>
+        <Button x:Name="getDataCaptrue" Content="getDataCaptrue" HorizontalAlignment="Left" Margin="10,10.2,0,0" Grid.Row="3" VerticalAlignment="Top" Width="181" Click="getDataCaptrue_Click"/>
+        <Button x:Name="saveDataToFile" Content="saveDataToFile" HorizontalAlignment="Left" Margin="10,29.2,0,0" Grid.Row="3" VerticalAlignment="Top" Width="181" Click="saveDataToFile_Click"/>
+        <Label Content="1" Grid.Column="1" HorizontalAlignment="Left" Margin="65.2,5.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="1.937,0.638" Width="32">
+            <Label.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform X="-91.968"/>
+                </TransformGroup>
+            </Label.RenderTransform>
+        </Label>
+        <Label Content="2" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,40.4,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+        <Label Content="3&#xD;&#xA;" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,80.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="0.31,-0.35"/>
+        <Label Content="4" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,105.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="-0.747,0.01"/>
+        <Button x:Name="getBodyData" Content="getBodyData" HorizontalAlignment="Left" Margin="10,227.4,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="getBodyData_Click"/>
+        <Button x:Name="StoreBodyData" Content="StoreBodyData" HorizontalAlignment="Left" Margin="90,227.4,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="storeBodyData_Click"/>
+
+
+
+    </Grid>
+</Window>
