@@ -102,7 +102,11 @@ namespace KinectGetData
             }
 
             // Launch the event! 发起活动！
-            Skeleton3DdataCoordReady(null, new Skeleton3DdataCoordEventArgs(p));
-        }
+            if (p!=null)
+            {
+                Skeleton3DdataCoordReady(null, new Skeleton3DdataCoordEventArgs(p));
+            }
+            }
+           
     }
 }

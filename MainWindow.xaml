@@ -18,9 +18,9 @@
 
         <StackPanel Grid.Column="0" Grid.Row="1">
             <ComboBox Name="gestureList" Width="400">
-                <ComboBoxItem IsSelected="True">@Right hand swipe left</ComboBoxItem>
-                <ComboBoxItem>@Right hand swipe right</ComboBoxItem>
-                <ComboBoxItem>@Left hand swipe left</ComboBoxItem>
+                <ComboBoxItem IsSelected="True">@喝水</ComboBoxItem>
+                <ComboBoxItem>@打电话</ComboBoxItem>
+                <ComboBoxItem>@打哈欠</ComboBoxItem>
                 <ComboBoxItem>@Left hand swipe right</ComboBoxItem>
                 <ComboBoxItem>@Two hands zoom in</ComboBoxItem>
                 <ComboBoxItem>@Two hands zoom out</ComboBoxItem>
@@ -46,6 +46,7 @@
         <TextBox FontSize="14" x:Name="status" Margin="10,45.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
         <TextBox FontSize="14" x:Name="currentBufferFrame" Margin="10,75.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
         <TextBox FontSize="14" x:Name="frameRate" Margin="10,110.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
+        <TextBox FontSize="14" x:Name="tiaoshi" Margin="10,145.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
 
 
 
@@ -71,6 +72,7 @@
         <Label Content="4" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,105.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="-0.747,0.01"/>
         <Button x:Name="getBodyData" Content="getBodyData" HorizontalAlignment="Left" Margin="10,227.4,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="getBodyData_Click"/>
         <Button x:Name="StoreBodyData" Content="StoreBodyData" HorizontalAlignment="Left" Margin="90,227.4,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="storeBodyData_Click"/>
+        <Button x:Name="choseMode" Content="choseMode" HorizontalAlignment="Left" Height="27" Margin="10,251.4,0,0" Grid.Row="2" Grid.RowSpan="2" VerticalAlignment="Top" Width="181" RenderTransformOrigin="0.484,-0.294" Click="choseMode_Click"/>
 
 
 

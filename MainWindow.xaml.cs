@@ -191,6 +191,8 @@ namespace KinectGetData
         private bool storeBodyData = false;
         private ArrayList bodyDateTemp = new ArrayList();
 
+        private bool reg2DMode = true; 
+
 
         /// <summary>        /// ArrayList of coordinates which are recorded in sequence to define one gesture</summary>
         private Timer trainDatacaptureCountdownTimer;
@@ -257,6 +259,8 @@ namespace KinectGetData
 
             file.Close();
         }
+
+        # region 弃用代码
 
         /// <summary>
         /// Called each time a skeleton frame is ready. Passes skeletal data to the DTW processor 每次骨架框准备好时调用。 将骨架数据传递给DTW处理器
@@ -581,6 +585,7 @@ namespace KinectGetData
         //        }
         //    }
         //}
+        # endregion
 
         /// <summary>
         /// Runs after the window is loaded 窗口加载后运行
@@ -627,8 +632,18 @@ namespace KinectGetData
 
                 this.bodyFrameReader.FrameArrived += this.Reader_BodyFrameArrived;
                 this.bodyFrameReader.FrameArrived += SkeletonExtractSkeletonFrameReady;
-                Skeleton2DDataExtract.Skeleton2DdataCoordReady += this.NuiSkeleton2DdataCoordReady;
-
+                // 采用2D识别
+                if (reg2DMode)
+                {
+                    Skeleton2DDataExtract.Skeleton2DdataCoordReady += this.NuiSkeleton2DdataCoordReady;
+                }
+                else //采用3D识别
+                {
+                    Skeleton3DDataExtract.Skeleton3DdataCoordReady += this.NuiSkeleton3DdataCoordReady;
+                }
+         
+               
+                #region
                 ////TODO 源代码 用于处理骨骼图像的操作
                 //this.sensor.SkeletonStream.Enable();
                 //// Create the drawing group we'll use for drawing  创建我们将用于绘图的绘图组
@@ -644,6 +659,8 @@ namespace KinectGetData
                 //this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
                 //this.sensor.SkeletonFrameReady += SkeletonExtractSkeletonFrameReady;
                 //Skeleton2DDataExtract.Skeleton2DdataCoordReady += this.NuiSkeleton2DdataCoordReady;
+                #endregion
+
                 try
                 {
                     this.sensor.Open();
@@ -664,6 +681,8 @@ namespace KinectGetData
 
             Debug.WriteLine("Finished Window Loading");
         }
+
+
 
 
 
@@ -690,6 +709,68 @@ namespace KinectGetData
         /// <param name="a">Skeleton 2Ddata Coord Event Args</param>
         private void NuiSkeleton2DdataCoordReady(object sender, Skeleton2DdataCoordEventArgs a)
         {
+            currentBufferFrame.Text = _video.Count.ToString();
+            // 在我们开始尝试将手势与记忆序列匹配之前，我们需要合理数量的帧
+            // We need a sensible number of frames before we start attempting to match gestures against remembered sequences
+            if (_video.Count > MinimumFrames && _capturing == false)
+            {
+                ////Debug.WriteLine("Reading and video.Count=" + video.Count);
+                string s = _dtw.Recognize(_video);
+                results.Text = "Recognised as: " + s;
+                if (!s.Contains("__UNKNOWN"))
+                {
+                    // There was no match so reset the buffer  没有匹配，所以重置缓冲区
+                    _video = new ArrayList();
+                }
+            }
+
+            // Ensures that we remember only the last x frames  确保我们只记住最后的x帧
+            if (_video.Count > BufferSize)
+            {
+                // If we are currently capturing and we reach the maximum buffer size then automatically store
+                // 如果我们正在捕获并且达到最大缓冲区大小，则自动存储
+                if (_capturing)
+                {
+                    DtwStoreClick(null, null);
+                }
+                else
+                {
+                    // Remove the first frame in the buffer  删除缓冲区中的第一帧
+                    _video.RemoveAt(0);
+                }
+            }
+
+            // Decide which skeleton frames to capture. Only do so if the frames actually returned a number. 
+            // For some reason my Kinect/PC setup didn't always return a double in range (i.e. infinity) even when standing completely within the frame.
+            // TODO Weird. Need to investigate this
+            // 确定要捕获的骨架帧。 只有在帧实际返回一个数字时才这样做。
+            // 出于某种原因，即使完全站在画面内，我的Kinect / PC设置并不总是返回双倍范围（即无限远）。
+            // 需要对此进行调查
+
+            if (!double.IsNaN(a.GetPoint(0).X))
+            {
+                // Optionally register only 1 frame out of every n  可选择每n只注册1帧
+                _flipFlop = (_flipFlop + 1) % Ignore;
+                if (_flipFlop == 0)
+                {
+                    _video.Add(a.GetCoords());
+                }
+            }
+
+            // Update the debug window with Sequences information  使用序列信息更新调试窗口
+            //dtwTextOutput.Text = _dtw.RetrieveText();
+        }
+
+        /// <summary>
+        /// 每次我们的3D坐标准备就运行。使用3D模式进行识别
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="a"></param>
+        private void NuiSkeleton3DdataCoordReady(object sender, Skeleton3DdataCoordEventArgs a)
+        {
+            //Debug.WriteLine("Finished Window Loading");
+            // TODO 
+            tiaoshi.Text = "3D识别";
             currentBufferFrame.Text = _video.Count.ToString();
             // 在我们开始尝试将手势与记忆序列匹配之前，我们需要合理数量的帧
             // We need a sensible number of frames before we start attempting to match gestures against remembered sequences
@@ -1048,10 +1129,21 @@ namespace KinectGetData
                 {
                     if (data != null)
                     {
-                        Skeleton2DDataExtract.ProcessData(data);
+                        if (data.IsTracked)
+                        {
+                            //TODO 采用何种模式进行识别
+                            if (reg2DMode)
+                            {
+                                Skeleton2DDataExtract.ProcessData(data);
+                            }
+                            else
+                            {
+                                Skeleton3DDataExtract.ProcessData(data);
+                            }
+                        }                   
                     }
 
-                    // TODO 新添加方法 用来获取一副身体的数据数据
+                    // TODO 新添加方法  仅仅用来获取一副身体的数据数据
                     if (data != null && getTrainBodyData)
                     {
                         bool isZero = chargeZero(data);
@@ -1308,6 +1400,19 @@ namespace KinectGetData
         private void storeBodyData_Click(object sender, RoutedEventArgs e)
         {
             storeBodyData = true;
+        }
+
+        private void choseMode_Click(object sender, RoutedEventArgs e)
+        {
+            reg2DMode = !reg2DMode;
+            if (reg2DMode)
+            {
+                choseMode.Content = "2D识别";
+            }
+            else
+            {
+                choseMode.Content = "3D识别";
+            }
         } 
 
     }
