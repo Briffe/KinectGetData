@@ -21,8 +21,8 @@
                 <ComboBoxItem IsSelected="True">@喝水</ComboBoxItem>
                 <ComboBoxItem>@打电话</ComboBoxItem>
                 <ComboBoxItem>@打哈欠</ComboBoxItem>
-                <ComboBoxItem>@Left hand swipe right</ComboBoxItem>
-                <ComboBoxItem>@Two hands zoom in</ComboBoxItem>
+                <ComboBoxItem>@打字</ComboBoxItem>
+                <ComboBoxItem>@读书</ComboBoxItem>
                 <ComboBoxItem>@Two hands zoom out</ComboBoxItem>
                 <ComboBoxItem>@Right hand wave</ComboBoxItem>
                 <ComboBoxItem>@Left hand wave</ComboBoxItem>
@@ -57,15 +57,7 @@
         </Viewbox>
         <Button x:Name="getDataCaptrue" Content="getDataCaptrue" HorizontalAlignment="Left" Margin="10,10.2,0,0" Grid.Row="3" VerticalAlignment="Top" Width="181" Click="getDataCaptrue_Click"/>
         <Button x:Name="saveDataToFile" Content="saveDataToFile" HorizontalAlignment="Left" Margin="10,29.2,0,0" Grid.Row="3" VerticalAlignment="Top" Width="181" Click="saveDataToFile_Click"/>
-        <Label Content="1" Grid.Column="1" HorizontalAlignment="Left" Margin="65.2,5.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="1.937,0.638" Width="32">
-            <Label.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform ScaleX="-1"/>
-                    <SkewTransform/>
-                    <RotateTransform/>
-                    <TranslateTransform X="-91.968"/>
-                </TransformGroup>
-            </Label.RenderTransform>
+        <Label Content="1" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,9.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="1.937,0.638" Width="22">
         </Label>
         <Label Content="2" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,40.4,0,0" Grid.Row="2" VerticalAlignment="Top"/>
         <Label Content="3&#xD;&#xA;" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,80.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="0.31,-0.35"/>

@@ -36,24 +36,27 @@ namespace KinectGetData
          */
 
         /// <summary>
-        /// Size of obeservations vectors. 观察向量的大小
+        /// Size of obeservations vectors. 观察向量的大小 默认12
         /// </summary>
         private readonly int _dimension;
+        //TODO 待更改 将所有的dtw的变量暂时都更改为可访问的 并且可更改 
+        //private readonly double _globalThreshold;
 
         /// <summary>
-        /// Maximum distance between the last observations of each sequence. 每个序列的最后观察之间的最大距离。
+        /// Maximum distance between the last observations of each sequence. 每个序列的最后观察之间的最大距离。 默认2
         /// </summary>
-        private readonly double _firstThreshold;
+        public  double _firstThreshold;
 
         /// <summary>
-        /// Minimum length of a gesture before it can be recognised 可以识别之前手势的最小长度
+        /// Minimum length of a gesture before it can be recognised 可以识别之前手势的最小长度 默认是10
         /// </summary>
-        private readonly double _minimumLength;
+        public double _minimumLength;
 
         /// <summary>
-        /// Maximum DTW distance between an example and a sequence being classified. 示例与被分类的序列之间的最大DTW距离。
+        /// Maximum DTW distance between an example and a sequence being classified. 示例与被分类的序列之间的最大DTW距离。 默认0.6
         /// </summary>
-        private readonly double _globalThreshold;
+
+        public double _globalThreshold;
 
         /// <summary>
         /// The gesture names. Index matches that of the sequences array in _sequences  手势名称。 索引与_sequences中的序列数组匹配
@@ -61,9 +64,9 @@ namespace KinectGetData
         private readonly ArrayList _labels;
 
         /// <summary>
-        /// Maximum vertical or horizontal steps in a row. 一行中的最大垂直或水平步长。
+        /// Maximum vertical or horizontal steps in a row. 一行中的最大垂直或水平步长。默认2
         /// </summary>
-        private readonly int _maxSlope;
+        public int _maxSlope;
 
         /// <summary>
         /// The recorded gesture sequences  录制的手势序列
@@ -98,6 +101,7 @@ namespace KinectGetData
         /// <param name="ms">Maximum vertical or horizontal steps in a row 一行中的最大垂直或水平步长</param>
         public DtwGestureRecognizer(int dim, double threshold, double firstThreshold, int ms, double minLen)
         {
+            // _dtw = new DtwGestureRecognizer(12, 0.6, 2, 2, 10);
             _dimension = dim;
             _sequences = new ArrayList();
             _labels = new ArrayList();
@@ -220,6 +224,53 @@ namespace KinectGetData
 
             return retStr;
         }
+
+        /// <summary>
+        ///3D模式 
+        /// 检索_label及其关联的_sequence的文本表示。用于显示调试信息和保存到文件
+        /// </summary>
+        /// <returns>A string containing all recorded gestures and their names</returns>
+        public string RetrieveText3D()
+        {
+            string retStr = String.Empty;
+
+            if (_sequences != null)
+            {
+                // Iterate through each gesture
+                for (int gestureNum = 0; gestureNum < _sequences.Count; gestureNum++)
+                {
+                    // Echo the label
+                    retStr += _labels[gestureNum] + "\r\n";
+
+                    int frameNum = 0;
+
+                    //Iterate through each frame of this gesture
+                    foreach (double[] frame in ((ArrayList)_sequences[gestureNum]))
+                    {
+                        // Extract each double
+                        foreach (double dub in (double[])frame)
+                        {
+                            retStr += dub + "\r\n";
+                        }
+
+                        // Signifies end of this double
+                        retStr += "~\r\n";
+
+                        frameNum++;
+                    }
+
+                    // Signifies end of this gesture
+                    retStr += "----";
+                    if (gestureNum < _sequences.Count - 1)
+                    {
+                        retStr += "\r\n";
+                    }
+                }
+            }
+
+            return retStr;
+        }
+
 
         /// <summary>
         /// Compute the min DTW distance between seq2 and all possible endings of seq1.

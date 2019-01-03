@@ -110,7 +110,7 @@ namespace KinectGetData
         /// <summary>/// Drawing image that we will display 绘制我们将要显示的图像/// </summary>
         private DrawingImage skelImageSource;
 
-        /// <summary>/// Flag to show whether or not the gesture recogniser is capturing a new pose 标记以显示手势识别器是否正在捕获新姿势/// </summary>
+        /// <summary>  Flag to show whether or not the gesture recogniser is capturing a new pose /// </summary>
         private bool _capturing;
 
         /// <summary>/// Dynamic Time Warping object/// </summary>
@@ -186,11 +186,14 @@ namespace KinectGetData
         private bool trainDatacapturing;
         /// <summary>ArrayList of coordinates which are recorded in sequence to define one gesture  </summary>
         private DateTime trainDatacaptureCountdown = DateTime.Now;
-
+        /// <summary> 获取训练数据的/// </summary>
         private bool getTrainBodyData = false;
+        /// <summary>/// 是否存储训练数据 /// </summary>
         private bool storeBodyData = false;
         private ArrayList bodyDateTemp = new ArrayList();
-
+        /// <summary>
+        /// 识别模式，如果是2d识别模式则为true，否则为false
+        /// </summary>
         private bool reg2DMode = true; 
 
 
@@ -259,6 +262,62 @@ namespace KinectGetData
 
             file.Close();
         }
+
+        /// <summary>
+        /// 3D姿势的识别
+        /// 将发送的文本文件作为笔并创建_dtw记录的手势序列当前不是非常灵活且完全不能容忍错误。
+        /// </summary>
+        /// <param name="fileLocation">Full path to the gesture file</param>
+        public void Load3DGesturesFromFile(string fileLocation)
+        {
+            int itemCount = 0;
+            string line;
+            string gestureName = String.Empty;
+
+            // TODO I'm defaulting this to 12 here for now as it meets my current need but I need to cater for variable lengths in the future
+            // 我现在将这个默认为12，因为它符合我目前的需要，但我需要在将来满足不同的长度需求
+            ArrayList frames = new ArrayList();
+            //由12改为18
+            double[] items = new double[18];
+
+            // Read the file and display it line by line.
+            System.IO.StreamReader file = new System.IO.StreamReader(fileLocation);
+            while ((line = file.ReadLine()) != null)
+            {
+                if (line.StartsWith("@"))
+                {
+                    gestureName = line;
+                    continue;
+                }
+
+                if (line.StartsWith("~"))
+                {
+                    frames.Add(items);
+                    itemCount = 0;
+                    //由12改为18
+                    items = new double[18];
+                    continue;
+                }
+
+                if (!line.StartsWith("----"))
+                {
+                    items[itemCount] = Double.Parse(line);
+                }
+
+                itemCount++;
+
+                if (line.StartsWith("----"))
+                {
+                    _dtw.AddOrUpdate(frames, gestureName);
+                    frames = new ArrayList();
+                    gestureName = String.Empty;
+                    itemCount = 0;
+                }
+            }
+
+            file.Close();
+        }
+
 
         # region 弃用代码
 
@@ -633,14 +692,14 @@ namespace KinectGetData
                 this.bodyFrameReader.FrameArrived += this.Reader_BodyFrameArrived;
                 this.bodyFrameReader.FrameArrived += SkeletonExtractSkeletonFrameReady;
                 // 采用2D识别
-                if (reg2DMode)
-                {
+                //if (reg2DMode)
+                //{
                     Skeleton2DDataExtract.Skeleton2DdataCoordReady += this.NuiSkeleton2DdataCoordReady;
-                }
-                else //采用3D识别
-                {
+                //}
+                //else //采用3D识别
+                //{
                     Skeleton3DDataExtract.Skeleton3DdataCoordReady += this.NuiSkeleton3DdataCoordReady;
-                }
+                //}
          
                
                 #region
@@ -709,6 +768,7 @@ namespace KinectGetData
         /// <param name="a">Skeleton 2Ddata Coord Event Args</param>
         private void NuiSkeleton2DdataCoordReady(object sender, Skeleton2DdataCoordEventArgs a)
         {
+            tiaoshi.Text = "2D识别";
             currentBufferFrame.Text = _video.Count.ToString();
             // 在我们开始尝试将手势与记忆序列匹配之前，我们需要合理数量的帧
             // We need a sensible number of frames before we start attempting to match gestures against remembered sequences
@@ -775,8 +835,22 @@ namespace KinectGetData
         private void NuiSkeleton3DdataCoordReady(object sender, Skeleton3DdataCoordEventArgs a)
         {
             //Debug.WriteLine("Finished Window Loading");
-            // TODO 
-            tiaoshi.Text = "3D识别";
+            //如果是3D识别模式的话，更改DTW的参数
+            if (_dtw != null)
+            {
+                if (_dtw._firstThreshold == 2)
+                {
+                    _dtw._firstThreshold = 1;
+                }
+                if (_dtw._globalThreshold == 0.6)
+                {
+                    _dtw._firstThreshold = 0.4;
+                }
+            }
+
+
+            // TODO 在状态栏增加3D识别的标志
+            tiaoshi.Text = "3D识别" + "  " + "_firstThreshold:"+_dtw._firstThreshold.ToString();
             currentBufferFrame.Text = _video.Count.ToString();
             // 在我们开始尝试将手势与记忆序列匹配之前，我们需要合理数量的帧
             // We need a sensible number of frames before we start attempting to match gestures against remembered sequences
@@ -950,9 +1024,21 @@ namespace KinectGetData
         /// <param name="e">Routed Event Args</param>
         private void DtwSaveToFile(object sender, RoutedEventArgs e)
         {
-            string fileName = GestureSaveFileNamePrefix + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
-            System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, _dtw.RetrieveText());
-            status.Text = "Saved to " + fileName;
+            //TODO 区分3D识别和2D识别
+            //如果是2D识别
+            if (reg2DMode)
+            {
+                string fileName = GestureSaveFileNamePrefix + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
+                System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, _dtw.RetrieveText());
+                status.Text = "Saved to " + fileName;
+            }
+            else
+            {
+                string fileName = GestureSaveFileNamePrefix +"3DReg_" +DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
+                System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, _dtw.RetrieveText3D());
+                status.Text = "Saved to " + fileName;
+            }
+            
         }
 
         /// <summary>
@@ -1077,6 +1163,7 @@ namespace KinectGetData
 
 
         /// <summary>
+        /// 可视化骨骼节点的处理方法
         /// Handles the body frame data arriving from the sensor and updates the associated gesture detector object for each body.
         /// On every frame received processes if the last detected gesture is recognised.
         /// Gets the gesture name of the last detected gesture.
@@ -1154,7 +1241,7 @@ namespace KinectGetData
                         }                   
                     }
 
-                    // TODO 新添加方法  仅仅用来获取一副身体的数据数据
+                    // TODO 新添加方法  仅仅用来获取一副身体的数据数据 可以通过多次点击获取数据
                     if (data != null && getTrainBodyData)
                     {
                         bool isZero = chargeZero(data);
@@ -1171,14 +1258,14 @@ namespace KinectGetData
                                 bodyDateTemp.Add(j.Position.Z);
                                 // TODO 添加谷歌节点的下标
                                 // bodyDateTemp.Add((int)j.JointType);
-                                int i = (int)j.JointType;
+                                // int i = (int)j.JointType;
                             }
                             bodyDateTemp.Add(1111.0);
                             getTrainBodyData = false;  
                         }
                     }
 
-                    //  是否存储数据
+                    //  是否存储训练数据数据
                     if (storeBodyData)
                     {
                         string fileName = "Bodydata" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
@@ -1328,9 +1415,21 @@ namespace KinectGetData
 
         private void saveDataToFile_Click(object sender, RoutedEventArgs e)
         {
-            string fileName = "Traindata" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
-            System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, captureTrainDataVideo(trainDatavideo));
-            status.Text = "Saved to " + fileName;
+            ////TODO 区分3d识别和2D识别
+            ////如果是2D
+            //if (reg2DMode)
+            //{
+                string fileName = "Traindata" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
+                System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, captureTrainDataVideo(trainDatavideo));
+                status.Text = "Saved to " + fileName;
+            //}
+            //else
+            //{
+            //    string fileName = "3DTraindata" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
+            //    System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, captureTrainDataVideo(trainDatavideo));
+            //    status.Text = "Saved to " + fileName;
+            //}
+            
         }
         /// <summary>
         /// 新添加用于将数据写入文件中
