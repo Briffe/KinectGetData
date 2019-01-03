@@ -719,6 +719,12 @@ namespace KinectGetData
                 results.Text = "Recognised as: " + s;
                 if (!s.Contains("__UNKNOWN"))
                 {
+                    //TODO 将识别结果加入到TextBox中
+                    RegResult.AppendText("Recognised as: " + s);
+                }
+                
+                if (!s.Contains("__UNKNOWN"))
+                {
                     // There was no match so reset the buffer  没有匹配，所以重置缓冲区
                     _video = new ArrayList();
                 }
@@ -779,6 +785,11 @@ namespace KinectGetData
                 ////Debug.WriteLine("Reading and video.Count=" + video.Count);
                 string s = _dtw.Recognize(_video);
                 results.Text = "Recognised as: " + s;
+                if (!s.Contains("__UNKNOWN"))
+                {
+                    //TODO 将识别结果加入到TextBox中
+                    RegResult.AppendText("Recognised as: " + s);
+                }
                 if (!s.Contains("__UNKNOWN"))
                 {
                     // There was no match so reset the buffer  没有匹配，所以重置缓冲区
