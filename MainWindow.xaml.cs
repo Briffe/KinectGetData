@@ -700,7 +700,9 @@ namespace KinectGetData
                 //{
                     Skeleton3DDataExtract.Skeleton3DdataCoordReady += this.NuiSkeleton3DdataCoordReady;
                 //}
-         
+                //TODO 调试信息，待注释
+                Console.WriteLine("调用了passToDTW方法");
+                //Debug.WriteLine("程序已经全部启动 带开启");
                
                 #region
                 ////TODO 源代码 用于处理骨骼图像的操作
@@ -848,7 +850,6 @@ namespace KinectGetData
                 }
             }
 
-
             // TODO 在状态栏增加3D识别的标志
             tiaoshi.Text = "3D识别" + "  " + "_firstThreshold:"+_dtw._firstThreshold.ToString();
             currentBufferFrame.Text = _video.Count.ToString();
@@ -857,7 +858,9 @@ namespace KinectGetData
             if (_video.Count > MinimumFrames && _capturing == false)
             {
                 ////Debug.WriteLine("Reading and video.Count=" + video.Count);
-                string s = _dtw.Recognize(_video);
+                //string s = _dtw.Recognize(_video);
+                // 更改为3D
+                string s = _dtw.RecognizeUse3D(_video);
                 results.Text = "Recognised as: " + s;
                 if (!s.Contains("__UNKNOWN"))
                 {

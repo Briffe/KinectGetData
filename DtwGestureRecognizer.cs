@@ -55,7 +55,6 @@ namespace KinectGetData
         /// <summary>
         /// Maximum DTW distance between an example and a sequence being classified. 示例与被分类的序列之间的最大DTW距离。 默认0.6
         /// </summary>
-
         public double _globalThreshold;
 
         /// <summary>
@@ -179,6 +178,37 @@ namespace KinectGetData
         }
 
         /// <summary>
+        /// Recognize gesture in the given sequence.
+        /// It will always assume that the gesture ends on the last observation of that sequence.
+        /// If the distance between the last observations of each sequence is too great, or if the overall DTW distance between the two sequence is too great, no gesture will be recognized.
+        /// 以给定的顺序识别手势。它总是假设手势在该序列的最后一次观察结束时结束。如果每个序列的最后观察之间的距离太大，或者如果两个序列之间的整体DTW距离太大，则不会识别出手势。
+        /// </summary>
+        /// <param name="seq">The sequence to recognise</param>
+        /// <returns>The recognised gesture name</returns>
+        public string RecognizeUse3D(ArrayList seq)
+        {
+            double minDist = double.PositiveInfinity;
+            string classification = "__UNKNOWN";
+            for (int i = 0; i < _sequences.Count; i++)
+            {
+                var example = (ArrayList)_sequences[i];
+                ////Debug.WriteLine(Dist2((double[]) seq[seq.Count - 1], (double[]) example[example.Count - 1]));
+                if (Dist2Use3D((double[])seq[seq.Count - 1], (double[])example[example.Count - 1]) < _firstThreshold)
+                {
+                    double d = DtwUse3D(seq, example) / example.Count;
+                    if (d < minDist)
+                    {
+                        minDist = d;
+                        classification = (string)_labels[i];
+                    }
+                }
+            }
+            return (minDist < _globalThreshold ? classification : "__UNKNOWN") + " " /*+minDist.ToString()*/;
+        }
+
+
+        #region RetrieveText 3d 和2d
+        /// <summary>
         /// Retrieves a text represeantation of the _label and its associated _sequence
         /// For use in dispaying debug information and for saving to file
         /// 检索_label及其关联的_sequence的文本表示。用于显示调试信息和保存到文件
@@ -270,7 +300,7 @@ namespace KinectGetData
 
             return retStr;
         }
-
+        #endregion
 
         /// <summary>
         /// Compute the min DTW distance between seq2 and all possible endings of seq1.
@@ -342,6 +372,76 @@ namespace KinectGetData
         }
 
         /// <summary>
+        /// Compute the min DTW distance between seq2 and all possible endings of seq1.
+        /// 计算seq2与seq1的所有可能结尾之间的最小DTW距离。
+        /// </summary>
+        /// <param name="seq1">The first array of sequences to compare</param>
+        /// <param name="seq2">The second array of sequences to compare</param>
+        /// <returns>The best match</returns>
+        public double DtwUse3D(ArrayList seq1, ArrayList seq2)
+        {
+            // Init
+            var seq1R = new ArrayList(seq1);
+            seq1R.Reverse();
+            var seq2R = new ArrayList(seq2);
+            seq2R.Reverse();
+            var tab = new double[seq1R.Count + 1, seq2R.Count + 1];
+            var slopeI = new int[seq1R.Count + 1, seq2R.Count + 1];
+            var slopeJ = new int[seq1R.Count + 1, seq2R.Count + 1];
+
+            for (int i = 0; i < seq1R.Count + 1; i++)
+            {
+                for (int j = 0; j < seq2R.Count + 1; j++)
+                {
+                    tab[i, j] = double.PositiveInfinity;
+                    slopeI[i, j] = 0;
+                    slopeJ[i, j] = 0;
+                }
+            }
+
+            tab[0, 0] = 0;
+
+            // Dynamic computation of the DTW matrix.
+            for (int i = 1; i < seq1R.Count + 1; i++)
+            {
+                for (int j = 1; j < seq2R.Count + 1; j++)
+                {
+                    if (tab[i, j - 1] < tab[i - 1, j - 1] && tab[i, j - 1] < tab[i - 1, j] && slopeI[i, j - 1] < _maxSlope)
+                    {
+                        tab[i, j] = Dist2Use3D((double[])seq1R[i - 1], (double[])seq2R[j - 1]) + tab[i, j - 1];
+                        slopeI[i, j] = slopeJ[i, j - 1] + 1;
+                        slopeJ[i, j] = 0;
+                    }
+                    else if (tab[i - 1, j] < tab[i - 1, j - 1] && tab[i - 1, j] < tab[i, j - 1] && slopeJ[i - 1, j] < _maxSlope)
+                    {
+                        tab[i, j] = Dist2Use3D((double[])seq1R[i - 1], (double[])seq2R[j - 1]) + tab[i - 1, j];
+                        slopeI[i, j] = 0;
+                        slopeJ[i, j] = slopeJ[i - 1, j] + 1;
+                    }
+                    else
+                    {
+                        tab[i, j] = Dist2Use3D((double[])seq1R[i - 1], (double[])seq2R[j - 1]) + tab[i - 1, j - 1];
+                        slopeI[i, j] = 0;
+                        slopeJ[i, j] = 0;
+                    }
+                }
+            }
+
+            // Find best between seq2 and an ending (postfix) of seq1. 在seq2和seq1的结尾（后缀）之间找到最佳。
+            double bestMatch = double.PositiveInfinity;
+            for (int i = 1; i < (seq1R.Count + 1) - _minimumLength; i++)
+            {
+                if (tab[i, seq2R.Count] < bestMatch)
+                {
+                    bestMatch = tab[i, seq2R.Count];
+                }
+            }
+
+            return bestMatch;
+        }
+
+
+        /// <summary>
         /// Computes a 1-distance between two observations. (aka Manhattan distance).
         /// 计算两个观测值之间的1距离。 （又名曼哈顿距离）。
         /// </summary>
@@ -376,5 +476,25 @@ namespace KinectGetData
 
             return Math.Sqrt(d);
         }
+
+        /// <summary>
+        /// 计算两个观测值之间的2距离。 （又名欧几里德距离）。
+        /// </summary>
+        /// <param name="a">Point a (double)</param>
+        /// <param name="b">Point b (double)</param>
+        /// <returns>Euclidian distance between the two points</returns>
+        private double Dist2Use3D(double[] a, double[] b)
+        {
+            double d = 0;
+            //for (int i = 0; i < _dimension; i++)
+            //TODO 2D更改为3D。默认的_dimension大小为12更改为18
+            for (int i = 0; i < 18; i++)
+            {
+                d += Math.Pow(a[i] - b[i], 2);
+            }
+
+            return Math.Sqrt(d);
+        }
+
     }
 }
