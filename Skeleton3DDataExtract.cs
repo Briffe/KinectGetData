@@ -48,6 +48,7 @@ namespace KinectGetData
             // Extract the coordinates of the points.  提取点的坐标。
             var p = new ThrPoint[6];
             ThrPoint shoulderRight = new ThrPoint(), shoulderLeft = new ThrPoint();
+            ThrPoint spineShoulder = new ThrPoint();
             // foreach (Joint j in data.Joints)
             foreach (Joint j in data.Joints.Values)
             {
@@ -77,11 +78,15 @@ namespace KinectGetData
                     case JointType.ShoulderRight:
                         shoulderRight = new ThrPoint(j.Position.X, j.Position.Y, j.Position.Z);
                         break;
+                    case JointType.SpineShoulder:
+                        spineShoulder = new ThrPoint(j.Position.X, j.Position.Y, j.Position.Z);
+                        break;
                 }
             }
 
-            // Centre the data  使数据居中
-            var center = new ThrPoint((shoulderLeft.X + shoulderRight.X) / 2, (shoulderLeft.Y + shoulderRight.Y) / 2, (shoulderLeft.Z + shoulderRight.Z) / 2);
+            // Centre the data  使数据居中 这里采用的是
+            //var center = new ThrPoint((shoulderLeft.X + shoulderRight.X) / 2, (shoulderLeft.Y + shoulderRight.Y) / 2, (shoulderLeft.Z + shoulderRight.Z) / 2);
+            var center = new ThrPoint(spineShoulder.X, spineShoulder.Y,spineShoulder.Z);
             for (int i = 0; i < 6; i++)
             {
                 p[i].X -= center.X;

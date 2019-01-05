@@ -56,8 +56,8 @@ namespace KinectGetData
         /// <summary>/// How many skeleton frames to store in the _video buffer  要在_video缓冲区中存储多少个骨架帧/// </summary>
         private const int BufferSize = 32;
 
-        /// <summary>/// The minumum number of frames in the _video buffer before we attempt to start matching gestures 在我们尝试开始匹配手势之前，视频缓冲区中的最小帧数/// </summary>
-        private const int MinimumFrames = 6;
+        /// <summary>/// 在我们尝试开始匹配手势之前，视频缓冲区中的最小帧数(默认是6帧 可以将其增加到12帧)/// </summary>
+        private const int MinimumFrames = 12;
 
         /// <summary>/// The minumum number of frames in the _video buffer before we attempt to start matching gestures 在我们尝试开始匹配手势之前_video缓冲区中的最小帧数
         /// </summary>
@@ -700,9 +700,7 @@ namespace KinectGetData
                 //{
                     Skeleton3DDataExtract.Skeleton3DdataCoordReady += this.NuiSkeleton3DdataCoordReady;
                 //}
-                //TODO 调试信息，待注释
-                Console.WriteLine("调用了passToDTW方法");
-                //Debug.WriteLine("程序已经全部启动 带开启");
+
                
                 #region
                 ////TODO 源代码 用于处理骨骼图像的操作
@@ -842,11 +840,11 @@ namespace KinectGetData
             {
                 if (_dtw._firstThreshold == 2)
                 {
-                    _dtw._firstThreshold = 1;
+                    _dtw._firstThreshold = 1.4;
                 }
                 if (_dtw._globalThreshold == 0.6)
                 {
-                    _dtw._firstThreshold = 0.4;
+                    _dtw._firstThreshold = 0.5;
                 }
             }
 
