@@ -57,15 +57,19 @@
         </Viewbox>
         <Button x:Name="getDataCaptrue" Content="getDataCaptrue" HorizontalAlignment="Left" Margin="10,10.2,0,0" Grid.Row="3" VerticalAlignment="Top" Width="181" Click="getDataCaptrue_Click"/>
         <Button x:Name="saveDataToFile" Content="saveDataToFile" HorizontalAlignment="Left" Margin="10,29.2,0,0" Grid.Row="3" VerticalAlignment="Top" Width="181" Click="saveDataToFile_Click"/>
-        <Label Content="1" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,9.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="1.937,0.638" Width="22">
+        <Label Content="1 results" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,9.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="1.937,0.638" Width="81" Grid.ColumnSpan="2">
         </Label>
-        <Label Content="2" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,40.4,0,0" Grid.Row="2" VerticalAlignment="Top"/>
-        <Label Content="3&#xD;&#xA;" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,80.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="0.31,-0.35"/>
-        <Label Content="4" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,105.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="-0.747,0.01"/>
+        <Label Content="2 status" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,40.4,0,0" Grid.Row="2" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="81"/>
+        <Label Content="3 currentBufferFrame" Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,75.4,0,0" Grid.Row="2" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="81" />
+        <Label Content="4 " Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,105.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="-0.747,0.01" Grid.ColumnSpan="2" Width="81"/>
+        <Label Content="5 tiaoshi " Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,140.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="-0.747,0.01" Grid.ColumnSpan="2" Width="81"/>
+        <Label Content="Capturetime " Grid.Column="1" HorizontalAlignment="Left" Margin="69.2,175.4,0,0" Grid.Row="2" VerticalAlignment="Top" RenderTransformOrigin="-0.747,0.01" Grid.ColumnSpan="2" Width="81"/>
         <Button x:Name="getBodyData" Content="getBodyData" HorizontalAlignment="Left" Margin="10,227.4,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="getBodyData_Click"/>
         <Button x:Name="StoreBodyData" Content="StoreBodyData" HorizontalAlignment="Left" Margin="90,227.4,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="storeBodyData_Click"/>
         <Button x:Name="choseMode" Content="choseMode" HorizontalAlignment="Left" Height="27" Margin="10,251.4,0,0" Grid.Row="2" Grid.RowSpan="2" VerticalAlignment="Top" Width="181" RenderTransformOrigin="0.484,-0.294" Click="choseMode_Click"/>
         <TextBox x:Name="RegResult" HorizontalAlignment="Left" Height="134" Margin="5,127.2,0,0" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Top" Width="186" VerticalScrollBarVisibility="Auto"/>
+        <TextBox FontSize="14" x:Name="Capturetime" Margin="0,180.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
+       
 
 
 

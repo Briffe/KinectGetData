@@ -169,9 +169,14 @@ namespace KinectGetData
         ///新添加↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
         ///      ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
         ///     ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-        
+
+      
+
         /// <summary> Reader for color frames </summary>
         private ColorFrameReader colorFrameReader = null;
+
+        /// <summary>录制次数 /// </summary>
+        public static int capturetime = 0;
 
         /// <summary>The datareader for the body frames </summary>
         private BodyFrameReader bodyFrameReader = null;
@@ -181,7 +186,7 @@ namespace KinectGetData
 
         /// <summary> This object draws the Kinectbodies in the presentation layer</summary>
         private BodyView kinectBodyView = null;
-
+     
         private ArrayList trainDatavideo;
         private bool trainDatacapturing;
         /// <summary>ArrayList of coordinates which are recorded in sequence to define one gesture  </summary>
@@ -835,16 +840,17 @@ namespace KinectGetData
         private void NuiSkeleton3DdataCoordReady(object sender, Skeleton3DdataCoordEventArgs a)
         {
             //Debug.WriteLine("Finished Window Loading");
-            //如果是3D识别模式的话，更改DTW的参数
+            //如果是3D识别模式的话，更改DTW的参数 
+            //_dimension  默认12   _globalThreshold 默认0.6 _maxSlope  _firstThreshold  默认2
             if (_dtw != null)
             {
                 if (_dtw._firstThreshold == 2)
                 {
-                    _dtw._firstThreshold = 1.4;
+                    _dtw._firstThreshold = 2.2;
                 }
                 if (_dtw._globalThreshold == 0.6)
                 {
-                    _dtw._firstThreshold = 0.5;
+                    _dtw._globalThreshold = 0.7;
                 }
             }
 
@@ -863,6 +869,8 @@ namespace KinectGetData
                 if (!s.Contains("__UNKNOWN"))
                 {
                     //TODO 将识别结果加入到TextBox中
+                    //TODO 识别效果，将录制的第几次给去掉
+                    s = s.Replace("_","");
                     RegResult.AppendText("Recognised as: " + s);
                 }
                 if (!s.Contains("__UNKNOWN"))
@@ -917,15 +925,18 @@ namespace KinectGetData
         private void DtwReadClick(object sender, RoutedEventArgs e)
         {
             // Set the buttons enabled state
-            dtwRead.IsEnabled = false;
-            dtwCapture.IsEnabled = true;
-            dtwStore.IsEnabled = false;
 
-            // Set the capturing? flag
-            _capturing = false;
-
-            // Update the status display
-            status.Text = "Reading";
+                    
+                     dtwRead.IsEnabled = false;
+                     dtwCapture.IsEnabled = true;
+                     dtwStore.IsEnabled = false;
+                     // Set the capturing? flag
+                     _capturing = false;
+                     // Update the status display
+                     status.Text = "Reading";
+                 
+            //}
+           
         }
 
         /// <summary>
@@ -935,13 +946,22 @@ namespace KinectGetData
         /// <param name="e">Routed Event Args</param>
         private void DtwCaptureClick(object sender, RoutedEventArgs e)
         {
-            _captureCountdown = DateTime.Now.AddSeconds(CaptureCountdownSeconds);
-            // _captureCountdown = DateTime.Now.AddSeconds(5);
-
-            _captureCountdownTimer = new Timer();
-            _captureCountdownTimer.Interval = 50;
-            _captureCountdownTimer.Start();
-            _captureCountdownTimer.Tick += CaptureCountdown;
+      
+                           //TODO 连续录制三次
+           // for (int i = 0; i < 3; i++)
+           //{
+                 capturetime = (capturetime + 1)%4;
+                
+                 if (capturetime != 0)
+                 {
+                     Capturetime.Text = "这是第" + capturetime + "次录制";
+                     _captureCountdown = DateTime.Now.AddSeconds(CaptureCountdownSeconds);
+                     // _captureCountdown = DateTime.Now.AddSeconds(5);
+                     _captureCountdownTimer = new Timer();
+                     _captureCountdownTimer.Interval = 50;
+                     _captureCountdownTimer.Start();
+                     _captureCountdownTimer.Tick += CaptureCountdown;
+                 }
         }
 
         /// <summary>
@@ -984,6 +1004,7 @@ namespace KinectGetData
             ////_captureCountdownTimer.Dispose();
 
             status.Text = "Recording gesture" + gestureList.Text;
+            Capturetime.Text = "";
 
             // Clear the _video buffer and start from the beginning
             _video = new ArrayList();
@@ -1008,7 +1029,26 @@ namespace KinectGetData
             status.Text = "Remembering " + gestureList.Text;
 
             // Add the current video buffer to the dtw sequences list
-            _dtw.AddOrUpdate(_video, gestureList.Text);
+            //TODO 处理重复录制
+            if (capturetime > 0)
+            {
+                if(capturetime == 1)
+                {
+                    _dtw.AddOrUpdate(_video, gestureList.Text);
+                }
+                else
+                {
+                    string temp = gestureList.Text;
+                    string str = "";
+                    for (int i = 0; i < capturetime-1;i++ )
+                    {
+                        str += "_";
+                    }
+                    temp = str + temp;
+                    _dtw.AddOrUpdate(_video, temp);
+                }
+            }
+            //_dtw.AddOrUpdate(_video, gestureList.Text);
             results.Text = "Gesture " + gestureList.Text + "added";
 
             // Scratch the _video buffer

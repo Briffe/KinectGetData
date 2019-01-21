@@ -41,6 +41,7 @@ namespace KinectGetData
         /// <param name="points">The points we need to handle in this class</param>
         public Skeleton3DdataCoordEventArgs(ThrPoint[] points)
         {
+            //TODO 如果不用浅表副本复制会怎么样
             _points = (ThrPoint[])points.Clone();
         }
 

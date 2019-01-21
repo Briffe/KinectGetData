@@ -163,11 +163,20 @@ namespace KinectGetData
             {
                 var example = (ArrayList) _sequences[i];
                 ////Debug.WriteLine(Dist2((double[]) seq[seq.Count - 1], (double[]) example[example.Count - 1]));
-                if (Dist2((double[]) seq[seq.Count - 1], (double[]) example[example.Count - 1]) < _firstThreshold)
+                double dist2 = Dist2((double[])seq[seq.Count - 1], (double[])example[example.Count - 1]);
+                //if (Dist2((double[]) seq[seq.Count - 1], (double[]) example[example.Count - 1]) < _firstThreshold)
+                Debug.WriteLine("任意时刻_firstThreshold：" + dist2);
+                if(dist2 < _firstThreshold)
                 {
-                    double d = Dtw(seq, example) / example.Count;
+                    double d = Dtw(seq, example) / example.Count;  
+                    // TODO
+                    Debug.WriteLine("任意时刻识别的DTW的结果是："+ d);
                     if (d < minDist)
                     {
+                        if (d != double.PositiveInfinity && d<0.6)
+                        {
+                            Debug.WriteLine("满足DTW的结果是：" + d);
+                        }
                         minDist = d;
                         classification = (string)_labels[i];
                     }
@@ -193,11 +202,23 @@ namespace KinectGetData
             {
                 var example = (ArrayList)_sequences[i];
                 ////Debug.WriteLine(Dist2((double[]) seq[seq.Count - 1], (double[]) example[example.Count - 1]));
-                if (Dist2Use3D((double[])seq[seq.Count - 1], (double[])example[example.Count - 1]) < _firstThreshold)
+                //if (Dist2Use3D((double[])seq[seq.Count - 1], (double[])example[example.Count - 1]) < _firstThreshold)
+                //if (Dist2Use3D((double[]) seq[seq.Count - 1], (double[]) example[example.Count - 1]) < _firstThreshold)
+                double dist2 = Dist2Use3D((double[])seq[seq.Count - 1], (double[])example[example.Count - 1]);
+                Debug.WriteLine("任意时刻_firstThreshold：" + dist2);
+                if (dist2 < _firstThreshold)
                 {
                     double d = DtwUse3D(seq, example) / example.Count;
+                    //TODO 待定删除的
+                    Debug.WriteLine("任意时刻识别的DTW的结果是：" + d);
                     if (d < minDist)
                     {
+                        ///
+                        if (d != double.PositiveInfinity && d < 0.6)
+                        {
+                            Debug.WriteLine("满足DTW的结果是：" + d);
+                        }
+                        ///
                         minDist = d;
                         classification = (string)_labels[i];
                     }
