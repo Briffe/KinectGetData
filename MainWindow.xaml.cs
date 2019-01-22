@@ -269,6 +269,59 @@ namespace KinectGetData
         }
 
         /// <summary>
+        /// Opens the sent text file and creates a _dtw recorded gesture sequence
+        /// Currently not very flexible and totally intolerant of errors.将发送的文本文件作为笔并创建_dtw记录的手势序列当前不是非常灵活且完全不能容忍错误。
+        /// </summary>
+        /// <param name="fileLocation">Full path to the gesture file</param>
+        public void LoadGesturesFrom3DFile(string fileLocation)
+        {
+            int itemCount = 0;
+            string line;
+            string gestureName = String.Empty;
+
+            // TODO I'm defaulting this to 12 here for now as it meets my current need but I need to cater for variable lengths in the future
+            // 我现在将这个默认为12，因为它符合我目前的需要，但我需要在将来满足不同的长度需求
+            ArrayList frames = new ArrayList();
+            double[] items = new double[18];
+
+            // Read the file and display it line by line.
+            System.IO.StreamReader file = new System.IO.StreamReader(fileLocation);
+            while ((line = file.ReadLine()) != null)
+            {
+                if (line.StartsWith("@"))
+                {
+                    gestureName = line;
+                    continue;
+                }
+
+                if (line.StartsWith("~"))
+                {
+                    frames.Add(items);
+                    itemCount = 0;
+                    items = new double[18];
+                    continue;
+                }
+
+                if (!line.StartsWith("----"))
+                {
+                    items[itemCount] = Double.Parse(line);
+                }
+
+                itemCount++;
+
+                if (line.StartsWith("----"))
+                {
+                    _dtw.AddOrUpdate(frames, gestureName);
+                    frames = new ArrayList();
+                    gestureName = String.Empty;
+                    itemCount = 0;
+                }
+            }
+
+            file.Close();
+        }
+
+        /// <summary>
         /// 3D姿势的识别
         /// 将发送的文本文件作为笔并创建_dtw记录的手势序列当前不是非常灵活且完全不能容忍错误。
         /// </summary>
@@ -1044,7 +1097,7 @@ namespace KinectGetData
                     {
                         str += "_";
                     }
-                    temp = str + temp;
+                    temp = temp + str;
                     _dtw.AddOrUpdate(_video, temp);
                 }
             }
@@ -1104,10 +1157,21 @@ namespace KinectGetData
             // Get the selected file name and display in a TextBox 获取所选文件名并显示在TextBox中
             if (result == true)
             {
+                if (reg2DMode)
                 // Open document
-                LoadGesturesFromFile(dlg.FileName);
-                dtwTextOutput.Text = _dtw.RetrieveText();
-                status.Text = "Gestures loaded!";
+                {
+                    LoadGesturesFromFile(dlg.FileName);
+                    dtwTextOutput.Text = _dtw.RetrieveText();
+                    status.Text = "Gestures loaded!";
+                }
+                else
+                {
+                    LoadGesturesFrom3DFile(dlg.FileName);
+                    dtwTextOutput.Text = _dtw.RetrieveText();
+                    status.Text = "Gestures loaded!";
+                }
+               
+               
             } 
         }
 
@@ -1301,7 +1365,8 @@ namespace KinectGetData
                                 // bodyDateTemp.Add((int)j.JointType);
                                 // int i = (int)j.JointType;
                             }
-                            bodyDateTemp.Add(1111.0);
+                            //bodyDateTemp.Add(1111.0);
+                            bodyDateTemp.Add("Frame");
                             getTrainBodyData = false;  
                         }
                     }
