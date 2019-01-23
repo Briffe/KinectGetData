@@ -45,26 +45,30 @@ namespace KinectGetData
 
             //旋转矩阵
             //这是绕Y轴的旋转矩阵
-            double[,] arr = new double[3, 3] { { cosValue, 0, -sinValue }, { 0, 1, 0 }, { sinValue, 0, cosValue } };
+            //double[,] arr = new double[3, 3] { { cosValue, 0, -sinValue }, { 0, 1, 0 }, { sinValue, 0, cosValue } };
+            double[,] arr = new double[3, 3] { { cosValue, 0, sinValue }, { 0, 1, 0 }, { -sinValue, 0, cosValue } };//方向反转,会好那么一点。
             //这是绕X轴的旋转矩阵
             //double[,] arr = new double[3, 3] { { 1, 0, 0 }, { 0, cosValue, -sinValue }, { 0, sinValue, cosValue } };
             //这是绕Z轴的旋转矩阵
             //double[,] arr = new double[3, 3] { { cosValue, -sinValue, 0 }, { sinValue, cosValue, 0 }, { 0, 0, 1 } };
 
+
+
             var rymatrix = mb.DenseOfArray(arr);
             
-            //旋转
-            for (int i = 0; i < oldArr.Length; ++i)
-            {
-                double[,] kinect_arr = new double[3, 1] { { oldArr[i].X }, { oldArr[i].Y }, { oldArr[i].Z } };
-                var kinect_mattrix = mb.DenseOfArray(kinect_arr);
-                double[,] tempArr = rymatrix.Multiply(kinect_mattrix).ToArray();
-                var thr = new ThrPoint();
-                thr.X = tempArr[0, 0];
-                thr.Y = tempArr[1, 0];
-                thr.Z = tempArr[2, 0];
-                newArr[i] = thr;
-            }
+                //旋转
+                for (int i = 0; i < oldArr.Length; ++i)
+                {
+                    double[,] kinect_arr = new double[3, 1] { { oldArr[i].X }, { oldArr[i].Y }, { oldArr[i].Z } };
+                    var kinect_mattrix = mb.DenseOfArray(kinect_arr);
+                    double[,] tempArr = rymatrix.Multiply(kinect_mattrix).ToArray();
+                    var thr = new ThrPoint();
+                    thr.X = tempArr[0, 0];
+                    thr.Y = tempArr[1, 0];
+                    thr.Z = tempArr[2, 0];
+                    newArr[i] = thr;
+                }
+
             //spineMid的旋转
             if (true)
             {
