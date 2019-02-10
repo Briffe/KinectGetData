@@ -838,7 +838,8 @@ namespace KinectGetData
                 if (!s.Contains("__UNKNOWN"))
                 {
                     //TODO 将识别结果加入到TextBox中
-                    RegResult.AppendText("Recognised as: " + s);
+                    RegResult.AppendText("Recognised as: " + s +"\r\n");
+                    RegResult.ScrollToEnd();
                 }
                 
                 if (!s.Contains("__UNKNOWN"))
@@ -1629,6 +1630,13 @@ namespace KinectGetData
             {
                 choseMode.Content = "3D识别";
             }
+        }
+
+        private void SavaRegLog_Click(object sender, RoutedEventArgs e)
+        {
+            string fileName = "识别记录" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
+            System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, RegResult.Text);
+            status.Text = "Saved to " + fileName;
         } 
 
     }
