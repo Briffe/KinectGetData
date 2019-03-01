@@ -9,7 +9,7 @@ namespace KinectGetData
 {
     class Utils
     {
-        public static double[,] getNewCord()
+        public static double[,] GetNewCord()
         {
             double[,] newArr = new double[6, 3];
             return newArr;

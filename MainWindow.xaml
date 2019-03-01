@@ -48,7 +48,23 @@
         <TextBox FontSize="14" x:Name="frameRate" Margin="10,110.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
         <TextBox FontSize="14" x:Name="tiaoshi" Margin="10,145.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
 
-
+        <ComboBox Name="JointList" Grid.ColumnSpan="2" Margin="5,10,100.6,9.8">
+            <ComboBoxItem IsSelected="True">HandRight</ComboBoxItem>
+            <ComboBoxItem>HandLeft</ComboBoxItem>
+            <ComboBoxItem>WristLeft</ComboBoxItem>
+            <ComboBoxItem>ElbowLeft</ComboBoxItem>
+            <ComboBoxItem>ElbowRight</ComboBoxItem>
+            <ComboBoxItem>SpineMid</ComboBoxItem>
+            <ComboBoxItem>WristRight</ComboBoxItem>
+            <ComboBoxItem>ThumbRight</ComboBoxItem>
+            <ComboBoxItem>HandTipRight</ComboBoxItem>
+            <ComboBoxItem>@Left hand pull down</ComboBoxItem>
+            <ComboBoxItem>@Right hand push up</ComboBoxItem>
+            <ComboBoxItem>@Left hand push up</ComboBoxItem>
+            <ComboBoxItem>@Both hands pull down</ComboBoxItem>
+            <ComboBoxItem>@Both hands push up</ComboBoxItem>
+            <ComboBoxItem>@Get on down at the disco!</ComboBoxItem>
+        </ComboBox>
 
         <TextBox Grid.Column="0" Grid.Row="3" FontSize="11" Name="dtwTextOutput" Margin="10,53.2,9.8,0" Focusable="True" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Center" VerticalAlignment="Top" Width="181" Height="64" VerticalScrollBarVisibility="Auto" IsReadOnly="True" />
         <Image x:Name="videoImage" Grid.Column="2" HorizontalAlignment="Left" Height="405" Margin="124.4,4.2,-43.6,0" Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top" Width="720"/>
@@ -70,6 +86,10 @@
         <TextBox x:Name="RegResult" HorizontalAlignment="Left" Height="134" Margin="5,127.2,0,0" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Top" Width="186" VerticalScrollBarVisibility="Auto" />
         <TextBox FontSize="14" x:Name="Capturetime" Margin="0,180.4,0,0" Focusable="False" BorderThickness="0" Text="" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Width="282" Height="30" Grid.Row="2" Grid.ColumnSpan="2" />
         <Button x:Name="SavaRegLog" Content="SavaRegLog" HorizontalAlignment="Left" Margin="10,272.2,0,-29" Grid.Row="3" Width="75" RenderTransformOrigin="0.38,0.225" Click="SavaRegLog_Click"/>
+        <Button x:Name="btn_getJointDate" Content="获取单节点数据" HorizontalAlignment="Left" Margin="10,196.4,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="btn_getJointDate_Click"/>
+        <Button x:Name="btn_storeOneJointData" Content="存储单节点的数据" HorizontalAlignment="Left" Margin="98,196.4,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="btn_storeOneJointData_Click"/>
+        <Button x:Name="btn_frameNum" Grid.ColumnSpan="2" Content="帧数" Grid.Column="1" HorizontalAlignment="Left" Margin="57.2,12,0,0" VerticalAlignment="Top" Width="44"/>
+        <TextBox x:Name="txt_FrameNum" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="10.2,8,0,0" TextWrapping="Wrap" Text="帧数" VerticalAlignment="Top" Width="47"/>
 
 
 

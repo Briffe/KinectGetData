@@ -187,6 +187,9 @@ namespace KinectGetData
         /// <summary> This object draws the Kinectbodies in the presentation layer</summary>
         private BodyView kinectBodyView = null;
      
+        /// <summary>
+        /// 存储训练数据的
+        /// </summary>
         private ArrayList trainDatavideo;
         private bool trainDatacapturing;
         /// <summary>ArrayList of coordinates which are recorded in sequence to define one gesture  </summary>
@@ -195,6 +198,9 @@ namespace KinectGetData
         private bool getTrainBodyData = false;
         /// <summary>/// 是否存储训练数据 /// </summary>
         private bool storeBodyData = false;
+        /// <summary>
+        /// 仅仅用来获取一副身体的数据数据 可以通过多次点击获取数据
+        /// </summary>
         private ArrayList bodyDateTemp = new ArrayList();
         /// <summary>
         /// 识别模式，如果是2d识别模式则为true，否则为false
@@ -206,6 +212,15 @@ namespace KinectGetData
         private Timer trainDatacaptureCountdownTimer;
         ///新添加↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
         ///新添加↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+        #region 存储单节点的连续数据
+        private bool  oneJointDatacapturing = false;
+        private ArrayList   oneJointDatavideo = new ArrayList();
+        private ArrayList all_oneJointDatavideo = new ArrayList();
+        private string jointName;
+        private int jointFrameNum = 300;
+
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class
@@ -1331,6 +1346,7 @@ namespace KinectGetData
             {
                 foreach (Body data in skeleton_array)
                 {
+                    #region 模式识别
                     if (data != null)
                     {
                         if (data.IsTracked)
@@ -1344,9 +1360,11 @@ namespace KinectGetData
                             {
                                 Skeleton3DDataExtract.ProcessData(data);
                             }
-                        }                   
+                        }
                     }
+                    #endregion
 
+                    #region 仅仅用来获取一副身体的数据数据 可以通过多次点击获取数据
                     // TODO 新添加方法  仅仅用来获取一副身体的数据数据 可以通过多次点击获取数据
                     if (data != null && getTrainBodyData)
                     {
@@ -1371,7 +1389,6 @@ namespace KinectGetData
                             getTrainBodyData = false;  
                         }
                     }
-
                     //  是否存储训练数据数据
                     if (storeBodyData)
                     {
@@ -1381,6 +1398,7 @@ namespace KinectGetData
                         storeBodyData = false;
                     }
 
+                    #endregion
 
                     //TODO  新添加的处理方法，用来获取训练数据
                     if(data!=null && trainDatacapturing)//只用到一个骨骼节点
@@ -1405,8 +1423,161 @@ namespace KinectGetData
                         }
                     }
 
+                    //TODO  新添加的处理方法，用来获取单骨骼节点的数据
+                    if (data != null && oneJointDatacapturing)//只用到一个骨骼节点
+                    {
+
+                        currentBufferFrame.Text = oneJointDatavideo.Count.ToString();
+                        processoneJointData(data);
+          
+                       
+                        // Ensures that we remember only the last x frames  确保我们只记住最后的x帧
+                        //if (oneJointDatavideo != null && oneJointDatavideo.Count > BufferSize)
+                        if (oneJointDatavideo != null && oneJointDatavideo.Count > jointFrameNum)
+                        {
+                            // If we are currently capturing and we reach the maximum buffer size then automatically store
+                            // 如果我们正在捕获并且达到最大缓冲区大小，则自动存储
+                            if (oneJointDatacapturing)
+                            {
+                                oneJointDatacapturing = false;
+                                double[] arr = new double[3] { 0, 0, 0 };
+                                oneJointDatavideo.Add(arr);
+                                all_oneJointDatavideo.AddRange(oneJointDatavideo);
+                                
+                            }
+                            else
+                            {
+                                // Remove the first frame in the buffer  删除缓冲区中的第一帧
+                                oneJointDatavideo.RemoveAt(0);
+                            }
+
+                        }
+                    }
+
 
                 }
+            }
+        }
+
+        /// <summary>
+        /// 单节点数据的处理方法
+        /// </summary>
+        /// <param name="data"></param>
+        private void processoneJointData(Body data)
+        {
+            // Extract the coordinates of the points.  提取点的坐标。
+            // foreach (Joint j in data.Joints)
+            double[] arr = new double[3];
+            bool inZero = true;
+            Joint spineMid = new Joint();
+
+            foreach (Joint j in data.Joints.Values)
+            {
+                if (j.JointType.Equals(JointType.HandRight))
+                {
+                    if (j.Position.X == 0 && j.Position.Y == 0 && j.Position.Z == 0)
+                    {
+                        inZero = false;
+                        break;
+                    }
+                }
+            }
+
+            if (inZero)
+            {
+                foreach (Joint j in data.Joints.Values)
+                {
+                    switch (j.JointType)
+                    {
+                        case JointType.HandLeft:
+                            if (JointList.Text.Equals(JointType.HandLeft))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            break;
+                        case JointType.WristLeft:
+                            if (JointList.Text.Equals(JointType.WristLeft))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            break;
+                        case JointType.ElbowLeft:
+                            if (JointList.Text.Equals(JointType.ElbowLeft))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            break;
+                        case JointType.ElbowRight:
+                            if (JointList.Text.Equals(JointType.ElbowRight))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            break;
+                        case JointType.WristRight:
+                            if (JointList.Text.Equals(JointType.WristRight))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            break;
+               
+                        case JointType.HandRight:
+                            if (JointList.Text.Equals(JointType.HandRight.ToString()))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            break;
+                        case JointType.ThumbRight:
+                            if (JointList.Text.Equals(JointType.ThumbRight.ToString()))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            break;
+                        case JointType.HandTipRight:
+                            if (JointList.Text.Equals(JointType.HandTipRight.ToString()))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            break;
+                        case JointType.SpineMid:
+                            if (JointList.Text.Equals(JointType.SpineMid))
+                            {
+                                arr[0] = j.Position.X; arr[1] = j.Position.Y; arr[2] = j.Position.Z;
+                            }
+                            spineMid.Position.X = j.Position.X; spineMid.Position.Y = j.Position.Y; spineMid.Position.Z = j.Position.Z;
+                            break;
+
+                    }
+                }
+
+
+                 //Centre the data  使数据居中
+                //for (int i = 0; i < 3; i++)
+                //{
+                //    arr[0] -= spineMid.Position.X;
+                //    arr[1] -= spineMid.Position.Y;
+                //    arr[2] -= spineMid.Position.Z;
+                //}
+
+              
+                if (trainDatavideo != null)
+                {
+                    if (!double.IsNaN(arr[0]))
+                    {
+                         // Optionally register only 1 frame out of every n  可选择每n只注册1帧
+                        _flipFlop = (_flipFlop + 1) % Ignore;
+                        if (_flipFlop == 0)
+                        {
+                            _video.Add(arr);
+                        }
+                    }
+                    oneJointDatavideo.Add(arr);
+                }
+                else
+                {
+                    oneJointDatavideo = new ArrayList();
+                }
+            
+
             }
         }
 
@@ -1444,7 +1615,7 @@ namespace KinectGetData
             return isZero;
         }
         /// <summary>
-        /// 新添加的
+        /// 新添加的 处理获取训练数据的
         /// </summary>
         /// <param name="data"></param>
         private void processTrainData(Body data)
@@ -1637,6 +1808,72 @@ namespace KinectGetData
             string fileName = "识别记录" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
             System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, RegResult.Text);
             status.Text = "Saved to " + fileName;
+        }
+
+        private void btn_getJointDate_Click(object sender, RoutedEventArgs e)
+        {
+             trainDatacaptureCountdown = DateTime.Now.AddSeconds(CaptureCountdownSeconds);
+            // _captureCountdown = DateTime.Now.AddSeconds(5);
+
+            trainDatacaptureCountdownTimer = new Timer();
+            trainDatacaptureCountdownTimer.Interval = 50;
+            trainDatacaptureCountdownTimer.Start();
+            trainDatacaptureCountdownTimer.Tick += oneJiontDataCaptureCountdown;
+        }
+
+        private void oneJiontDataCaptureCountdown(object sender, EventArgs e)
+        {
+ 	      if (sender == trainDatacaptureCountdownTimer)
+            {
+                if (DateTime.Now < trainDatacaptureCountdown)
+                {
+                    status.Text = "Wait " + ((trainDatacaptureCountdown - DateTime.Now).Seconds + 1) + " seconds";
+                }
+                else
+                {
+                    trainDatacaptureCountdownTimer.Stop();
+                    status.Text = "Recording gesture";
+                    StartOneJointDataCapture();
+                }
+            }
+        }
+
+        private void StartOneJointDataCapture()
+        {
+ 	        oneJointDatacapturing = true;
+            //TODO 隐去可保证多次录入
+            oneJointDatavideo = new ArrayList();
+        }
+
+        private void btn_storeOneJointData_Click(object sender, RoutedEventArgs e)
+        {
+            oneJointDatacapturing = false;
+            string fileName = JointList.Text + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt";
+            System.IO.File.WriteAllText(GestureSaveFileLocation + fileName, captureOneJointDataVideo(all_oneJointDatavideo));
+            status.Text = "Saved to " + fileName;
+            all_oneJointDatavideo = new ArrayList();
+        }
+
+        private string captureOneJointDataVideo(ArrayList trainDatavideo)
+        {
+            String str = "";
+            str += JointList.Text + "\r\n";
+            foreach (double[] frame in trainDatavideo)
+            {
+                // Echo the label
+                //Iterate through each frame of this gesture
+                // Extract each double
+                foreach (double dub in (double[])frame)
+                {
+                    str += dub + " ";
+                }
+                str += "\r\n";
+                // Signifies end of this double
+            }
+
+            // Signifies end of this gesture
+            str += "----";
+            return str;
         } 
 
     }

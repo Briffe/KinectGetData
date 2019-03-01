@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="KinectGetData.BodyView">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAEAAAQAAAQAQAkEAIGIAAIAhAAEAAAIAAQIiCAE=</HashCode>
+      <FileName>BodyView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KinectGetData.MainWindow">
+    <Position X="2.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>LnFVBiAXGSZQAACmqBglIkAhqIMhSFiICCIBIYAAABE=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="KinectGetData.Skeleton3DDataExtract">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="KinectGetData.Skeleton3DDataExtract.Skeleton3DdataCoordEventHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Skeleton3DDataExtract.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skeleton3DDataExtract.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KinectGetData.Skeleton3DdataCoordEventArgs">
+    <Position X="7.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAEAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skeleton3DdataCoordEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KinectGetData.DtwGestureRecognizer">
+    <Position X="11.25" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>gAAAIAAAAAgABgBAAAAAAAAAgAIEDAAAUAAgAEAAAAA=</HashCode>
+      <FileName>DtwGestureRecognizer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KinectGetData.Utils">
+    <Position X="8.75" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="KinectGetData.ThrPoint">
+    <Position X="7.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAE=</HashCode>
+      <FileName>ThrPoint.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>
